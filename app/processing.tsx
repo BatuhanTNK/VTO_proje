@@ -15,8 +15,7 @@ import { Button } from '@/components/Button';
 import { ErrorAlert } from '@/components/ErrorAlert';
 import { useTryOn } from '@/context/TryOnContext';
 import { ApiService } from '@/services/api';
-// Hata verdiği için HistoryService'i artık burada kullanmıyoruz.
-// import { HistoryService } from '@/services/historyService'; 
+import { HistoryService } from '@/services/historyService'; // Bu import'un aktif olduğundan emin olun
 import {
   Colors,
   Gradients,
@@ -25,7 +24,10 @@ import {
   FontWeights,
   Spacing,
 } from '@/constants/theme';
-import { TryOnResult } from '@/types'; // TryOnResult tipini import etmemiz gerekebilir.
+import { TryOnResult } from '@/types'; // Bu import'un da aktif olduğundan emin olun
+
+// expo-file-system import'u
+import * as FileSystem from 'expo-file-system/legacy';
 
 export default function ProcessingScreen() {
   const router = useRouter();
@@ -38,28 +40,16 @@ export default function ProcessingScreen() {
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const rotateAnim = useRef(new Animated.Value(0)).current;
 
+  // Animasyon useEffect'leri (değişiklik yok)
   useEffect(() => {
     Animated.loop(
       Animated.sequence([
-        Animated.timing(pulseAnim, {
-          toValue: 1.2,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(pulseAnim, {
-          toValue: 1,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
+        Animated.timing(pulseAnim, { toValue: 1.2, duration: 1000, useNativeDriver: true }),
+        Animated.timing(pulseAnim, { toValue: 1, duration: 1000, useNativeDriver: true }),
       ])
     ).start();
-
     Animated.loop(
-      Animated.timing(rotateAnim, {
-        toValue: 1,
-        duration: 3000,
-        useNativeDriver: true,
-      })
+      Animated.timing(rotateAnim, { toValue: 1, duration: 3000, useNativeDriver: true })
     ).start();
   }, [pulseAnim, rotateAnim]);
 
@@ -68,46 +58,76 @@ export default function ProcessingScreen() {
       router.replace('/select-images');
       return;
     }
-
     processTryOn();
   }, []);
 
+  // getSafeImageUri fonksiyonu (değişiklik yok)
+  const getSafeImageUri = async (uri: string): Promise<string> => {
+    if (uri.startsWith('http')) {
+      return uri;
+    }
+    if (uri.startsWith('file://')) {
+      try {
+        const base64 = await FileSystem.readAsStringAsync(uri, {
+          encoding: 'base64',
+        });
+        const format = uri.endsWith('.png') ? 'png' : 'jpeg';
+        return `data:image/${format};base64,${base64}`;
+      } catch (e) {
+        console.error("Failed to read file as Base64", e);
+        throw new Error("Failed to process local image file.");
+      }
+    }
+    return uri;
+  };
+
+  // --- DEĞİŞİKLİK BU FONKSİYONDA ---
   const processTryOn = async () => {
     if (!selectedPersonImage || !selectedGarmentImage) return;
 
     try {
       setProgress('Preparing images...');
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      
+      const personImageUri = await getSafeImageUri(selectedPersonImage.uri);
+      const garmentImageUri = await getSafeImageUri(selectedGarmentImage.uri);
+
+      if (isCancelled) return;
+      
       setProgress('Sending to AI...');
 
       const response = await ApiService.processTryOn({
-        personImageUrl: selectedPersonImage.uri,
-        garmentImageUrl: selectedGarmentImage.uri,
+        personImageUrl: personImageUri,
+        garmentImageUrl: garmentImageUri,
       });
 
       if (isCancelled) return;
 
       if (response.success && response.resultImageUrl) {
-        
-        // --- DEĞİŞİKLİK BURADA ---
-        // Supabase kaydetme adımını atlıyoruz ve sonucu manuel oluşturuyoruz.
-        
-        setProgress('Finalizing result...'); // Mesajı güncelledik
+        // --- SUPABASE KAYDETME KODU YENİDEN AKTİF EDİLDİ ---
+        setProgress('Saving results...'); // Mesajı "Saving" olarak güncelledik
 
-        // const savedResult = await HistoryService.saveToHistory({ ... }); // BU SATIRI DEVRE DIŞI BIRAKTIK
-        
-        // Sonuç ekranının ihtiyacı olan 'currentResult' nesnesini manuel olarak oluşturalım:
-        const newResult: TryOnResult = {
-          id: `temp-${Date.now()}`, // Geçici bir ID veriyoruz
+        // Supabase'i çağıran satırları geri ekliyoruz:
+        const savedResult = await HistoryService.saveToHistory({
           personImageUrl: selectedPersonImage.uri,
           garmentImageUrl: selectedGarmentImage.uri,
           resultImageUrl: response.resultImageUrl,
-          createdAt: new Date().toISOString(),
-          isFavorite: false,
-        };
+        });
 
-        // 'if (savedResult)' kontrolünü kaldırıp 'setCurrentResult'i doğrudan çağırıyoruz:
-        setCurrentResult(newResult);
+        // Kontrolü geri ekliyoruz
+        if (savedResult) { 
+          setCurrentResult(savedResult);
+        } else {
+          // Kaydetme başarısız olsa bile (yeni bir hata olursa diye) sonucu yine de göster
+          console.warn("Failed to save to history, but proceeding to result.");
+          setCurrentResult({
+              id: `temp-${Date.now()}`,
+              personImageUrl: selectedPersonImage.uri,
+              garmentImageUrl: selectedGarmentImage.uri,
+              resultImageUrl: response.resultImageUrl,
+              createdAt: new Date().toISOString(),
+              isFavorite: false,
+          });
+        }
         // --- DEĞİŞİKLİK BİTTİ ---
 
         setProgress('Complete!');
@@ -119,11 +139,14 @@ export default function ProcessingScreen() {
       }
     } catch (err) {
       if (isCancelled) return;
-      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      console.error('Processing error:', err);
+      setError(errorMessage);
       setShowError(true);
     }
   };
 
+  // Kalan fonksiyonlar (değişiklik yok)
   const handleCancel = () => {
     setIsCancelled(true);
     router.back();
@@ -146,6 +169,7 @@ export default function ProcessingScreen() {
     outputRange: ['0deg', '360deg'],
   });
 
+  // return (JSX) kısmı (değişiklik yok)
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <LinearGradient colors={Gradients.background} style={styles.gradient}>
@@ -201,8 +225,8 @@ export default function ProcessingScreen() {
   );
 }
 
+// Stiller (değişiklik yok)
 const styles = StyleSheet.create({
-  // Stillerde değişiklik yok...
   container: {
     flex: 1,
     backgroundColor: Colors.background,

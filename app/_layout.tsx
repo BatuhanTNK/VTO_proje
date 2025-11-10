@@ -22,7 +22,7 @@ export default function RootLayout() {
       NavigationBar.setVisibilityAsync('hidden');
       
       // 2. Kullanıcı alttan yukarı kaydırdığında çubuğun geçici olarak gelmesini sağla
-      NavigationBar.setBehaviorAsync('inset-swipe');
+     // NavigationBar.setBehaviorAsync('inset-swipe');
     }
   }, []); // Bu kod sadece 1 kez çalışacak
   // ---

@@ -54,9 +54,10 @@
     "experiments": {
       "typedRoutes": true
     },
+    
     "extra": {
-      "EXPO_PUBLIC_SUPABASE_URL": "https://hrswiyvkjmqgcnozbivw.supabase.co",
-      "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhyc3dpeXZram1xZ2Nub3piaXZ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0MDk1OTIsImV4cCI6MjA3NTk4NTU5Mn0.Sa0ZTkVoRUKyk5VSgh2YGCD4VPu5wrU8t4oRM8hIEgE"
+      "EXPO_PUBLIC_SUPABASE_URL": "https://ednjwfuhqxwloacvubuu.supabase.co",
+      "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkbmp3ZnVocXh3bG9hY3Z1YnV1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIyNTMwNTMsImV4cCI6MjA3NzgyOTA1M30.h8cnhFFfRRqa3r7ENCiMHF5jDbKi73rvNWYlqUSquxA"
     }
   }
 }
