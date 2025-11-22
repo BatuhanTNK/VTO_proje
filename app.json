@@ -8,6 +8,7 @@
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
+      "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#0F172A"
     },
@@ -26,7 +27,8 @@
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.READ_EXTERNAL_STORAGE",
-        "android.permission.WRITE_EXTERNAL_STORAGE"
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.RECORD_AUDIO"
       ]
     },
     "web": {
@@ -54,10 +56,13 @@
     "experiments": {
       "typedRoutes": true
     },
-    
     "extra": {
       "EXPO_PUBLIC_SUPABASE_URL": "https://ednjwfuhqxwloacvubuu.supabase.co",
-      "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkbmp3ZnVocXh3bG9hY3Z1YnV1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIyNTMwNTMsImV4cCI6MjA3NzgyOTA1M30.h8cnhFFfRRqa3r7ENCiMHF5jDbKi73rvNWYlqUSquxA"
+      "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkbmp3ZnVocXh3bG9hY3Z1YnV1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIyNTMwNTMsImV4cCI6MjA3NzgyOTA1M30.h8cnhFFfRRqa3r7ENCiMHF5jDbKi73rvNWYlqUSquxA",
+      "router": {},
+      "eas": {
+        "projectId": "ce202217-6b92-49ca-95ab-e418de827372"
+      }
     }
   }
 }

@@ -15,7 +15,7 @@ import { Button } from '@/components/Button';
 import { ErrorAlert } from '@/components/ErrorAlert';
 import { useTryOn } from '@/context/TryOnContext';
 import { ApiService } from '@/services/api';
-import { HistoryService } from '@/services/historyService'; // Bu import'un aktif olduğundan emin olun
+import { HistoryService } from '@/services/historyService'; 
 import {
   Colors,
   Gradients,
@@ -61,7 +61,7 @@ export default function ProcessingScreen() {
     processTryOn();
   }, []);
 
-  // getSafeImageUri fonksiyonu (değişiklik yok)
+  //base64 dönüştürme
   const getSafeImageUri = async (uri: string): Promise<string> => {
     if (uri.startsWith('http')) {
       return uri;
@@ -81,7 +81,7 @@ export default function ProcessingScreen() {
     return uri;
   };
 
-  // --- DEĞİŞİKLİK BU FONKSİYONDA ---
+  
   const processTryOn = async () => {
     if (!selectedPersonImage || !selectedGarmentImage) return;
 
